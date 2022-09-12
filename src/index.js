@@ -2,39 +2,61 @@ import './css/styles.css';
 import Notiflix from 'notiflix';
 import debounce from 'lodash.debounce';
 import { fetchCountries } from './fetchCountries';
+import { markupCountryCard, markupCountryList } from './markup';
 
 const DEBOUNCE_DELAY = 300;
-const formEl = document.querySelector('#search-box');
-const countryContainer = document.querySelector('.country-info');
-const countryList = document.querySelector('.country-list');
+const inputEl = document.querySelector('#search-box');
+const countryListEl = document.querySelector('.country-list');
+const countryCardEl = document.querySelector('.country-info');
 
-formEl.addEventListener('input', debounce(onSearch, DEBOUNCE_DELAY));
-
+inputEl.addEventListener('input', debounce(onSearch, DEBOUNCE_DELAY));
+countryListEl.addEventListener('click', onClickCountry);
 
 
 function onSearch(event) {
-    event.preventDefault();
+  const countryName = event.target.value.trim();
+  
+    if (countryName) {
+      fetchCountries(countryName)
+        .then(countries => {
+          checkCountry(countries);
+        })
+    }
+    else {clearList()}
+}
 
-    const formValue = event.target.value.trim();
-    
-    if (!formValue.length) {
-    return;
+function clearList () {
+  countryListEl.innerHTML = '';
+  countryCardEl.innerHTML = '';
+}
+
+function checkCountry(countries) {
+  clearList();
+
+  if (countries.length > 10) {
+    Notiflix.Notify.info('Too many matches found. Please enter a more specific name.');
+  } else if (countries.length > 1) {
+    countryListEl.innerHTML = markupCountryList(countries);
+    // console.log(countries);
+  } else if (countries.length === 1) {
+    countryCardEl.innerHTML = markupCountryCard(countries[0]);
+  } else {
+    Notiflix.Notify.failure('Oops, there is no country with that name');
   }
+}
 
-    fetchCountries(name)
-        .then(renderCountry)
-        .catch(onFetchError)
-      
+function onClickCountry(event) {
+  inputEl.value = event.target.dataset.name.trim();
+  // console.log(inputEl.value);
+  onSearch({ target: inputEl });
 }
 
 
-function onFetchError(error) {
-     Notiflix.Notify.failure('Oops, there is no country with that name');
-}
 
-function renderCountry() {
-    
-}
+
+
+
+
 
 
 
