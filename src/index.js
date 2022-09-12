@@ -1,8 +1,8 @@
 import './css/styles.css';
 import Notiflix from 'notiflix';
 import debounce from 'lodash.debounce';
-import { fetchCountries } from './fetchCountries';
-import { markupCountryCard, markupCountryList } from './markup';
+import { fetchCountries } from './js/fetchCountries';
+import { markupCountryCard, markupCountryList } from './js/markup';
 
 const DEBOUNCE_DELAY = 300;
 const inputEl = document.querySelector('#search-box');
@@ -37,7 +37,6 @@ function checkCountry(countries) {
     Notiflix.Notify.info('Too many matches found. Please enter a more specific name.');
   } else if (countries.length > 1) {
     countryListEl.innerHTML = markupCountryList(countries);
-    // console.log(countries);
   } else if (countries.length === 1) {
     countryCardEl.innerHTML = markupCountryCard(countries[0]);
   } else {
@@ -47,7 +46,6 @@ function checkCountry(countries) {
 
 function onClickCountry(event) {
   inputEl.value = event.target.dataset.name.trim();
-  // console.log(inputEl.value);
   onSearch({ target: inputEl });
 }
 
